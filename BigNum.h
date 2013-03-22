@@ -10,7 +10,7 @@ using namespace std;
     }
     BigNum::~BigNum() {
     }
-    void BigNum::input() {			//Работает
+    void BigNum::input() {    		//Работает
         short* buf = (short*) malloc (sizeof(short) * MAX_SIZE);
         int cap_buf = MAX_SIZE;
         int i=0;
@@ -143,39 +143,55 @@ using namespace std;
         }
         return;
     }
-        int BigNum::min_size (BigNum *a, BigNum *b) {
+    BigNum BigNum::min_size (BigNum *a, BigNum *b) { // по модулю!!!!!!
         int x = a->num.size_of_vector();
         int y = b->num.size_of_vector();
         if (x <= y ) {
-            return	x;
+            return	*a;
         } else {
-            return y;
+            return *b;
         }
     }
-    int BigNum::max_size (BigNum* a, BigNum* b) {
+    BigNum BigNum::max_size (BigNum* a, BigNum* b) {   // по модулю!!!!!!
         int x = a->num.size_of_vector();
         int y = b->num.size_of_vector();
         if (x <= y ) {
-            return	y;
+            return	*b;
         } else {
-            return x;
+            return *a;
         }
     }
-
-    BigNum & BigNum::operator =(BigNum a){
-        this->num = a.num;
-        this->sign = a.sign;
-        return *this;
+    my::vector<int> BigNum::dif (BigNum max, BigNum min) {
+        BigNum difference;
+        int j = min.num.size_of_vector();
+        for (int i = 0; i < j; ++i) {
+             if(max.num [i] < min.num[i]) {
+                  max.num [i] += pow(10, radix_size);
+                  max.num [i+1] -= 1;
+             }
+             difference.num.push_back(max.num [i] - min.num[i]);
+        }
+        for (int i = j; i < max.num.size_of_vector(); ++i){
+            if (max.num[i] < 0) {
+                max.num [i] += pow(10, radix_size);
+                max.num [i+1] -= 1;
+            }
+            difference.num.push_back(max.num[i]);
+        }
+        return difference.num;
     }
 
-    BigNum&  BigNum::operator + (BigNum a) {
+
+    BigNum  BigNum::operator + (BigNum a) {
+        BigNum min_abs = min_size (this, &a); // минимальный по модулю
+        BigNum max_abs = max_size(this, &a);// максимальный по модулю
+        int min = min_abs.num.size_of_vector();
+        int max = max_abs.num.size_of_vector();
+        BigNum sum;
         if (this->sign == a.sign) {
-         BigNum sum;
          sum.sign = this->sign;
          int buf = 0;
          int x;
-         int min = min_size (this, &a);
-         int max = max_size (this, &a);;
           BigNum max_num;
           if (max == a.num.size_of_vector()) {
               max_num = a;
@@ -193,11 +209,45 @@ using namespace std;
             buf = x / radix;
             sum.num.push_back (x % radix);
         }
-        return sum;
+        if (buf != 0) {
+            sum.num.push_back(buf);
         }
+        } else {
+            sum.sign = max_abs.sign;
+            max_abs.sign = true;
+            min_abs.sign = true;
+            sum.num = dif(max_abs, min_abs);
+
+        }
+        return sum;
     }
 
-
+    BigNum BigNum::operator - (BigNum a){
+        BigNum max = max_size(this, &a);
+        BigNum min = min_size(this, &a);
+        BigNum difference;
+        if (min == a) {
+            difference.sign = true;
+        } else {
+            difference.sign = false;
+        }
+        int j = min.num.size_of_vector();
+        for (int i = 0; i < j; ++i) {
+             if(max.num [i] < min.num[i]) {
+                  max.num [i] += pow(10, radix_size);
+                  max.num [i+1] -= 1;
+             }
+             difference.num.push_back(max.num [i] - min.num[i]);
+        }
+        for (int i = j; i < max.num.size_of_vector(); ++i){
+            if (max.num[i] < 0) {
+                max.num [i] += pow(10, radix_size);
+                max.num [i+1] -= 1;
+            }
+            difference.num.push_back(max.num[i]);
+        }
+        return difference;
+    }
 /*	BigNum & operator + (SMALLNUM a) {;
     }
     BigNum & operator + (BigNum a) {;
@@ -209,7 +259,11 @@ using namespace std;
         } else {
 
         }
-    }
+    }*/
+
+
+
+   /*
     BigNum & operator * (SMALLNUM a) {;
     }
     BigNum & operator * (BigNum a) {;
@@ -306,8 +360,8 @@ using namespace std;
     bool BigNum::operator < (BigNum a) {
         return (!(this->operator >= (a)));
     }
- /*   void BigNum::operator = (BigNum a){
+    void BigNum::operator = (BigNum a){
         this->sign = a.sign;
         this->num = a.num;
         return;
-    }*/
+    }
