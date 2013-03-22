@@ -248,6 +248,25 @@ using namespace std;
         }
         return difference;
     }
+    
+        BigNum BigNum::operator * (SMALLNUM a){
+        BigNum product;
+        if (this->sign == false){
+                product.sign = false;
+        }
+        int buf = 0;
+        int n = this->num.size_of_vector();
+        for (int i = 0; i < n; ++i) {
+            int x = this->num[i] * a + buf;
+            buf = x / radix;
+            product.num.push_back(x % radix);
+        }
+        if (buf != 0) {
+            product.num.push_back(buf);
+        }
+        return product;
+    }
+
 /*	BigNum & operator + (SMALLNUM a) {;
     }
     BigNum & operator + (BigNum a) {;
