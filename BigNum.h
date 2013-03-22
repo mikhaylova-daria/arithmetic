@@ -266,7 +266,19 @@ using namespace std;
         }
         return product;
     }
-
+    BigNum BigNum::operator *(BigNum a) {
+        BigNum product;
+        if (a.sign != this -> sign) {
+            product.sign =false;
+        }
+        BigNum max = max_size(this, &a);
+        BigNum min = min_size(this, &a);
+        int n = min.num.size_of_vector();
+        for (int i = 0; i < n; ++i) {
+            product = product + max * min.num[i]* pow(radix, i);
+        }
+        return product;
+    }
 /*	BigNum & operator + (SMALLNUM a) {;
     }
     BigNum & operator + (BigNum a) {;
