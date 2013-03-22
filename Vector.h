@@ -51,16 +51,17 @@
         ~BigNum();
         void input();
         void output();
-        int min_size (BigNum *a, BigNum *b);
-        int max_size (BigNum *a, BigNum *b);
-    //	BigNum & operator + (SMALLNUM a);
-        BigNum & operator + (BigNum a);
-        /*BigNum & operator -(SMALLNUM a);
-        BigNum & operator * (SMALLNUM a);
+        BigNum min_size (BigNum *a, BigNum *b);
+        BigNum max_size (BigNum *a, BigNum *b);
+        my::vector<int> dif (BigNum , BigNum );
+    //    BigNum & operator + (SMALLNUM a);
+        BigNum operator + (BigNum a);
+        BigNum  operator -(BigNum a);
+        /*BigNum & operator * (SMALLNUM a);
         BigNum & operator * (BigNum a);
         BigNum & operator / (SMALLNUM a);
         BigNum & operator / (BigNum a);*/
-        BigNum & operator = (BigNum a);
+        void  operator = (BigNum a);
         bool operator == (BigNum a);
         bool operator != (BigNum a);
         bool operator >= (BigNum a);
@@ -72,4 +73,3 @@
     #include "BigNum.h"
 
 #endif
-
