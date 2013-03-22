@@ -64,6 +64,16 @@ using namespace std;
         ++size;
         return 0;
     }
+    template <typename T>
+    int my::vector<T>::remove_top(){
+        if (size > 0){
+            ~p_vector[size-1];
+            --size;
+            return 0;
+        } else{
+        return 1;
+        }
+    }
 
     template <typename T>
     int my::vector<T>::size_of_vector(){
