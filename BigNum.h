@@ -203,8 +203,17 @@ using namespace std;
         return product;
     }
 
+    void BigNum::remove_null(){
+        int k = this->num.size_of_vector() - 1;
+        while ((this->num[k] == 0)&& (k > 0)) {
+            this->num.remove_top();
+            k = this->num.size_of_vector() - 1;
+        }
+        return;
+    }
 
-    BigNum BigNum::Karatsuba (BigNum a){
+
+        BigNum BigNum::Karatsuba (BigNum a){
         BigNum min = min_size(this, &a);
         BigNum max = max_size(this, &a);
         BigNum A_0;
@@ -213,11 +222,6 @@ using namespace std;
         BigNum B_1;
         int length = max.num.size_of_vector();
         int length_min = min.num.size_of_vector();
-        if ((length_min == 0) || (length == 0)) {
-            BigNum c;
-            c.num.push_back(0);
-            return c;
-        }
         if ((length < 3) || (length_min < 3)) return min * max;
         for (int i = 0; i < length / 2; ++i) {
             A_0.num.push_back(max.num[i]);
@@ -234,23 +238,20 @@ using namespace std;
         BigNum rad;
         rad.num.push_back(0);
         rad.num.push_back(1);
-        rad = rad.power(length / 2);
+        int t = length / 2;
+        rad = rad.power(t);
         BigNum puisne = A_0.Karatsuba(B_0);
         BigNum major = A_1.Karatsuba(B_1);
-        BigNum sum_1 = A_0+A_1;
-        BigNum sum_2 = B_0+B_1;
+        BigNum sum_1 = A_0 + A_1;
+        BigNum sum_2 = B_0 + B_1;
         BigNum product_sum = sum_1.Karatsuba(sum_2);
         BigNum med =product_sum - puisne;
         med = med - major;
-        med = med * rad;
+        med = med.Karatsuba(rad);
         rad = rad.power(2);
         major = major * rad;
         return puisne + med + major;
     }
-
-
-
-
 
 
     BigNum  BigNum::operator + (BigNum a) {
@@ -319,11 +320,7 @@ using namespace std;
             }
             difference.num.push_back(max.num[i]);
         }
-        int k = difference.num.size_of_vector() - 1;
-        while ((difference.num[k] == 0)&& (k > 0)) {
-            difference.num.remove_top();
-            k = difference.num.size_of_vector() - 1;
-        }
+        difference.remove_null();
         return difference;
     }
 
@@ -344,13 +341,11 @@ using namespace std;
         if (buf != 0) {
             product.num.push_back(buf);
         }
-        int k = product.num.size_of_vector() - 1;
-        while ((product.num[k] == 0)&& (k > 0)) {
-            product.num.remove_top();
-            k = product.num.size_of_vector() - 1;
-        }
+        product.remove_null();
         return product;
     }
+
+
     BigNum BigNum::operator *(BigNum a) {
         BigNum product;
         if (a.sign != this -> sign) {
@@ -370,11 +365,7 @@ using namespace std;
             }
             product = product + x;
         }
-        int k = product.num.size_of_vector() - 1;
-        while ((product.num[k] == 0)&& (k > 0)) {
-            product.num.remove_top();
-            k = product.num.size_of_vector() - 1;
-        }
+        product.remove_null();
         return product;
     }
 
