@@ -56,6 +56,7 @@
         BigNum max_size (BigNum *a, BigNum *b);
         my::vector<int> dif (BigNum , BigNum );
         BigNum power(int);
+        BigNum Karatsuba(BigNum a);
 
     //    BigNum & operator + (SMALLNUM a);
         BigNum operator + (BigNum a);
