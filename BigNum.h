@@ -144,23 +144,24 @@ using namespace std;
         return;
     }
     BigNum BigNum::min_size (BigNum *a, BigNum *b) { // по модулю!!!!!!
-        int x = a->num.size_of_vector();
-        int y = b->num.size_of_vector();
-        if (x <= y ) {
-            return	*a;
-        } else {
+        a->sign = true;
+        b->sign = true;
+        if (*a >= *b) {
             return *b;
-        }
-    }
-    BigNum BigNum::max_size (BigNum* a, BigNum* b) {   // по модулю!!!!!!
-        int x = a->num.size_of_vector();
-        int y = b->num.size_of_vector();
-        if (x <= y ) {
-            return	*b;
         } else {
             return *a;
         }
     }
+    BigNum BigNum::max_size (BigNum *a, BigNum *b) {   // по модулю!!!!!!
+        a->sign = true;
+        b->sign = true;
+        if (*a <= *b) {
+            return *b;
+        } else {
+            return *a;
+        }
+     }
+
     my::vector<int> BigNum::dif (BigNum max, BigNum min) {
         BigNum difference;
         int j = min.num.size_of_vector();
@@ -180,17 +181,21 @@ using namespace std;
         }
         return difference.num;
     }
+
+
     BigNum BigNum::power(int n) {
         BigNum product;
         product.num.push_back(1);
+        BigNum x = *this;
         bool flag = true;
         while (flag) {
             if (n % 2 == 1) {
-                product = product * (*this);
+                product = product * x;
+
             }
             n = n / 2;
             if (n > 0) {
-                product = product * product;
+               x = (x * x);
             } else {
                 flag = false;
             }
@@ -199,30 +204,76 @@ using namespace std;
     }
 
 
+    BigNum BigNum::Karatsuba (BigNum a){
+        BigNum min = min_size(this, &a);
+        BigNum max = max_size(this, &a);
+        BigNum A_0;
+        BigNum A_1;
+        BigNum B_0;
+        BigNum B_1;
+        int length = max.num.size_of_vector();
+        int length_min = min.num.size_of_vector();
+        if ((length_min == 0) || (length == 0)) {
+            BigNum c;
+            c.num.push_back(0);
+            return c;
+        }
+        if ((length < 3) || (length_min < 3)) return min * max;
+        for (int i = 0; i < length / 2; ++i) {
+            A_0.num.push_back(max.num[i]);
+            if (length_min > i) {
+                B_0.num.push_back(min.num [i]);
+             }
+        }
+        for (int i = length / 2; i < length; ++i) {
+            A_1.num.push_back(max.num[i]);
+            if (length_min > i) {
+                B_1.num.push_back(min.num[i]);
+             }
+        }
+        BigNum rad;
+        rad.num.push_back(0);
+        rad.num.push_back(1);
+        rad = rad.power(length / 2);
+        BigNum puisne = A_0.Karatsuba(B_0);
+        BigNum major = A_1.Karatsuba(B_1);
+        BigNum sum_1 = A_0+A_1;
+        BigNum sum_2 = B_0+B_1;
+        BigNum product_sum = sum_1.Karatsuba(sum_2);
+        BigNum med =product_sum - puisne;
+        med = med - major;
+        med = med * rad;
+        rad = rad.power(2);
+        major = major * rad;
+        return puisne + med + major;
+    }
+
+
+
+
+
+
     BigNum  BigNum::operator + (BigNum a) {
         BigNum min_abs = min_size (this, &a); // минимальный по модулю
         BigNum max_abs = max_size(this, &a);// максимальный по модулю
         int min = min_abs.num.size_of_vector();
         int max = max_abs.num.size_of_vector();
+        if ((min == 0)|| (max == 0)) {
+            return max_abs;
+        }
         BigNum sum;
         if (this->sign == a.sign) {
          sum.sign = this->sign;
          int buf = 0;
          int x;
-          BigNum max_num;
-          if (max == a.num.size_of_vector()) {
-              max_num = a;
-            } else {
-                max_num = *this;
-             }
         for (int i = 0; i < min; ++i) {
-            x = (this->num[i]) + a.num[i] + buf;
+            x = (min_abs.num[i]) + max_abs.num[i] + buf;
             buf = x / radix;
             sum.num.push_back(x % radix);
         }
 
         for (int i = min; i < max; ++i) {
-            x = max_num.num[i] + buf;
+            x = max_abs.num[i] + buf;
             buf = x / radix;
             sum.num.push_back (x % radix);
         }
@@ -239,6 +290,8 @@ using namespace std;
         return sum;
     }
 
+
+
     BigNum BigNum::operator - (BigNum a){
         BigNum max = max_size(this, &a);
         BigNum min = min_size(this, &a);
@@ -249,10 +302,13 @@ using namespace std;
             difference.sign = false;
         }
         int j = min.num.size_of_vector();
+        int g = max.num.size_of_vector();
         for (int i = 0; i < j; ++i) {
              if(max.num [i] < min.num[i]) {
                   max.num [i] += pow(10, radix_size);
-                  max.num [i+1] -= 1;
+                  if (i+1 < g) {
+                      max.num [i+1] -= 1;
+                  }
              }
              difference.num.push_back(max.num [i] - min.num[i]);
         }
@@ -263,11 +319,17 @@ using namespace std;
             }
             difference.num.push_back(max.num[i]);
         }
+        int k = difference.num.size_of_vector() - 1;
+        while ((difference.num[k] == 0)&& (k > 0)) {
+            difference.num.remove_top();
+            k = difference.num.size_of_vector() - 1;
+        }
         return difference;
     }
 
 
     BigNum BigNum::operator * (SMALLNUM a){
+
         BigNum product;
         if (this->sign == false){
                 product.sign = false;
@@ -291,15 +353,22 @@ using namespace std;
     }
     BigNum BigNum::operator *(BigNum a) {
         BigNum product;
-        product.num.push_back(0);
         if (a.sign != this -> sign) {
             product.sign =false;
         }
+        product.num.push_back(0);
         BigNum max = max_size(this, &a);
         BigNum min = min_size(this, &a);
         int n = min.num.size_of_vector();
-        for (int i = 0; i < n; ++i) {
-            product = product + (max *(int) min.num[i]) * pow(radix, i);
+        product = (max *(int) min.num[0]);
+        for (int i = 1; i < n; ++i) {
+            BigNum x = (max *(int) min.num[i]);
+            for (int j = 0; j < i; ++j ){
+                for (int f = 0; f < radix_size; ++f){
+                     x = x * X;
+                }
+            }
+            product = product + x;
         }
         int k = product.num.size_of_vector() - 1;
         while ((product.num[k] == 0)&& (k > 0)) {
@@ -345,7 +414,7 @@ using namespace std;
         }
 
         if (y == x) {
-            for (int i = 0; i < x; ++i) {
+            for (int i = x-1; i >= 0; --i) {
                 if (this->num[i] > a.num[i]) {
                     return true;
                 }
@@ -377,7 +446,7 @@ using namespace std;
         }
 
         if (y == x) {
-            for (int i = 0; i < x; ++i) {
+            for (int i = x-1; i >= 0; --i) {
                 if (this->num[i] > a.num[i]) {
                     return false;
                 }
@@ -401,5 +470,4 @@ using namespace std;
         this->num = a.num;
         return;
     }
-
 
