@@ -8,6 +8,22 @@ using namespace std;
     BigNum::BigNum(const BigNum& a): sign(a.sign){
         num = a.num;
     }
+    BigNum::BigNum(SMALLNUM x) {
+        if (x < 0) {
+            this->sign = false;
+            x = -x;
+        } else {
+            this->sign = true;
+        }
+        if (x == 0) {
+            this->num.push_back(0);
+        }
+        while (x > 0) {
+            this->num.push_back(x % radix);
+            x = x / radix;
+        }
+    }
+
     BigNum::~BigNum() {
     }
     void BigNum::input() {    		//Работает
@@ -213,7 +229,7 @@ using namespace std;
     }
 
 
-        BigNum BigNum::Karatsuba (BigNum a){
+    BigNum BigNum::Karatsuba (BigNum a){
         BigNum min = min_size(this, &a);
         BigNum max = max_size(this, &a);
         BigNum A_0;
@@ -252,6 +268,7 @@ using namespace std;
         major = major * rad;
         return puisne + med + major;
     }
+
 
 
     BigNum  BigNum::operator + (BigNum a) {
@@ -346,7 +363,7 @@ using namespace std;
     }
 
 
-    BigNum BigNum::operator *(BigNum a) {
+    BigNum BigNum::operator * (BigNum a) {
         BigNum product;
         if (a.sign != this -> sign) {
             product.sign =false;
@@ -355,9 +372,9 @@ using namespace std;
         BigNum max = max_size(this, &a);
         BigNum min = min_size(this, &a);
         int n = min.num.size_of_vector();
-        product = (max *(int) min.num[0]);
+        product = (max * (int) min.num[0]);
         for (int i = 1; i < n; ++i) {
-            BigNum x = (max *(int) min.num[i]);
+            BigNum x = (max * (int) min.num[i]);
             for (int j = 0; j < i; ++j ){
                 for (int f = 0; f < radix_size; ++f){
                      x = x * X;
@@ -368,6 +385,14 @@ using namespace std;
         product.remove_null();
         return product;
     }
+
+
+  /*  BigNum BigNum::operator / (BigNum a){
+        int size = this->num.size_of_vector();
+        int size_divider = a.num.size_of_vector();
+        if ((size < size_divider)||(size == size_divider) && (this->num[size - 1] < a.num [size - 1])) return 0;
+
+    }*/
 
     bool BigNum::operator == (BigNum a){
         if (a.sign == this->sign) {
@@ -461,4 +486,89 @@ using namespace std;
         this->num = a.num;
         return;
     }
+
+    //ОТСЛЕЖИВАТЬ ЛИ ДЕЛЕНИЕ НА 0???
+    BigNum  division_of_numbers_similar_length__return_modulo(BigNum dividend, BigNum divider, SMALLNUM &quotient) {
+            long x;
+            int y;
+            BigNum intermediate;
+            BigNum modulo;
+            int dividend_size = dividend.num.size_of_vector();
+            int divider_size = divider.num.size_of_vector();
+            if (dividend_size == divider_size) {
+                x = dividend.num[dividend_size - 1];
+            }
+            if (dividend_size == divider_size + 1) {
+                x = dividend.num[dividend_size - 1] * radix + dividend.num[dividend_size - 2];
+            }
+            if (dividend_size < divider_size) {
+                quotient = 0;
+                return dividend;
+            }
+
+            y = divider.num[divider_size - 1];
+            quotient = x / y;
+            modulo = dividend - divider * quotient;
+            if (quotient > 0) {
+                BigNum null(0);
+                while ((modulo < null) && (quotient > 0)) {
+                    --quotient;
+                    intermediate = divider * quotient;
+                    modulo = dividend - intermediate;
+                }
+            }
+            return modulo;
+        }
+
+
+    BigNum division(BigNum dividend, BigNum divider, BigNum &quotient) {//Возвращает остаток, при делении на null кидает строку "null"
+        BigNum null(0);
+        if (divider == null) {
+            throw ("divide by 0");
+            return null;
+        }
+        BigNum old_hat;
+        BigNum new_hat;
+        BigNum result;
+        int current_num_of_quotient;
+        int size_of_quotient;
+        int size_dividend;
+        int size;
+        size = divider.num.size_of_vector();
+        size_dividend = dividend.num.size_of_vector();
+        int x = size_dividend;
+        for (int i = 0; i < size; ++i) {
+            old_hat.num.push_back(dividend.num[x - size + i]);
+        }
+        for (int i = 0; i < size; ++i) {
+             dividend.num.remove_top();
+             --size_dividend;
+        }
+        new_hat = division_of_numbers_similar_length__return_modulo(old_hat, divider, current_num_of_quotient);
+        if (current_num_of_quotient == 0) {
+            old_hat.num.put_on_bot (dividend.num[size_dividend - 1]);          // если шапка не поделилась  на делитель, дописываем разряд
+            dividend.num.remove_top();
+            --size_dividend;
+            new_hat = division_of_numbers_similar_length__return_modulo(old_hat, divider, current_num_of_quotient);//пробуем поделить снова
+        }
+        size_of_quotient = size_dividend + 1;    // количество цифр в частном = количество цифр в делимом без шапки +1 (учитываем шапку)
+        for (int i = 0; i < size_of_quotient; ++i) {
+            result.num.push_back(0);
+        }
+        result.num [size_of_quotient - 1] = current_num_of_quotient;  //записали наибольший разряд частного
+        int i;
+        for (i = size_of_quotient - 2; i>=0; --i) {
+            if (new_hat != null) {
+                new_hat.num.put_on_bot(dividend.num[size_dividend - 1]);          //перенесли следующий разряд
+            } else {
+                new_hat.num[0] = dividend.num[size_dividend - 1];
+            }
+            --size_dividend;
+            new_hat =  division_of_numbers_similar_length__return_modulo(new_hat, divider, current_num_of_quotient);
+            result.num[i] = current_num_of_quotient;
+        }
+        quotient = result;
+        return new_hat;
+    }
+
 
