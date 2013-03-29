@@ -387,12 +387,20 @@ using namespace std;
     }
 
 
-  /*  BigNum BigNum::operator / (BigNum a){
-        int size = this->num.size_of_vector();
-        int size_divider = a.num.size_of_vector();
-        if ((size < size_divider)||(size == size_divider) && (this->num[size - 1] < a.num [size - 1])) return 0;
 
-    }*/
+    BigNum BigNum::operator / (BigNum a){
+        BigNum x;
+        division(*this, a, x);
+        return x;
+    }
+
+
+    BigNum BigNum::operator % (BigNum a){
+        BigNum x;
+        return division(*this, a, x);
+    }
+
+
 
     bool BigNum::operator == (BigNum a){
         if (a.sign == this->sign) {
