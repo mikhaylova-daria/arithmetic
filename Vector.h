@@ -59,6 +59,7 @@
         my::vector<int> dif (BigNum , BigNum );
         BigNum power(int);
         BigNum power(BigNum);
+        BigNum sqrt();          //целая часть от квадратного коряня
         BigNum Karatsuba(BigNum a);
         void remove_null ();
     //    BigNum & operator + (SMALLNUM a);
