@@ -65,8 +65,8 @@
         BigNum operator -(BigNum a);
         BigNum operator * (SMALLNUM a);
         BigNum operator * (BigNum a);
-        /*BigNum & operator / (SMALLNUM a);
-        BigNum & operator / (BigNum a);*/
+        BigNum operator / (BigNum a);
+        BigNum operator % (BigNum a);
         void  operator = (BigNum a);
         bool operator == (BigNum a);
         bool operator != (BigNum a);
