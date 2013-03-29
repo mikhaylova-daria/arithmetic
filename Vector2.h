@@ -64,6 +64,20 @@ using namespace std;
         ++size;
         return 0;
     }
+    
+        template <typename T>
+    int my::vector<T>::put_on_bot (T const new_){
+        int _size =  this->size_of_vector() + 1;
+        my::vector<T> buf(_size);
+        buf.push_back(new_);
+        for (int i = 1; i < _size; ++i) {
+           buf.push_back(this->operator[](i-1));
+        }
+        *this = buf;
+        return 0;
+    }
+    
+    
     template <typename T>
     int my::vector<T>::remove_top(){
         if (size > 0){
