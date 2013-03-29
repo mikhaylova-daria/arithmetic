@@ -219,6 +219,32 @@ using namespace std;
         return product;
     }
 
+    BigNum BigNum::power(BigNum n) {
+        BigNum product;
+        product.num.push_back(1);
+        BigNum x(*this);
+        bool flag = true;
+        BigNum null(0);
+        BigNum two(2);
+        BigNum one (1);
+        BigNum mod;
+        BigNum buf = n;
+        while (flag) {
+            mod = division(buf, two, buf);
+            if (mod == one) {
+                product = product * x;
+
+            }
+            if (buf > null) {
+               x = x * x;
+            } else {
+                flag = false;
+            }
+        }
+        return product;
+    }
+    
+
     void BigNum::remove_null(){
         int k = this->num.size_of_vector() - 1;
         while ((this->num[k] == 0)&& (k > 0)) {
@@ -531,8 +557,17 @@ using namespace std;
 
     BigNum division(BigNum dividend, BigNum divider, BigNum &quotient) {//Возвращает остаток, при делении на null кидает строку "null"
         BigNum null(0);
+        BigNum one(1);
         if (divider == null) {
             throw ("divide by 0");
+            return null;
+        }
+        if (dividend < divider) {
+            quotient = null;
+            return dividend;
+        }
+        if (dividend == divider){
+            quotient = one;
             return null;
         }
         BigNum old_hat;
