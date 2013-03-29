@@ -32,6 +32,7 @@
         vector (vector const &a);
         ~vector();
         int push_back (T const new_);
+        int put_on_bot (T const new_);//положить на "дно"
         int size_of_vector();
         void output ();
         int remove_top();
@@ -48,6 +49,7 @@
         bool sign;
     public:
         BigNum();
+        BigNum(SMALLNUM x);
         BigNum(const BigNum &a);
         ~BigNum();
         void input();
@@ -72,6 +74,8 @@
         bool operator <= (BigNum a);
         bool operator > (BigNum a);
         bool operator < (BigNum a);
+        friend BigNum division_of_numbers_similar_length__return_modulo (BigNum dividend, BigNum divider, SMALLNUM &quotient);
+        friend BigNum division(BigNum dividend, BigNum divider, BigNum &quotient);// Возвращают остаток от деления (обе)!!!
     };
     #include "Vector2.h"
     #include "BigNum.h"
