@@ -618,6 +618,13 @@ using namespace std;
     }
 
     bool BigNum::operator >= (BigNum a) {
+        BigNum null(0);
+        if (a.integ.num.size_of_vector() == 0) {
+            a.integ = null;
+        }
+        if (this->integ.num.size_of_vector() == 0){
+             this->integ = null;
+        }
         if (a == *this) {
             return true;
         }
@@ -650,6 +657,13 @@ using namespace std;
     }
 
     bool BigNum::operator <= (BigNum a){
+        BigNum null(0);
+        if (a.integ.num.size_of_vector() == 0) {
+            a.integ = null;
+        }
+        if (this->integ.num.size_of_vector() == 0){
+             this->integ = null;
+        }
         if (a == *this) {
             return true;
         }
